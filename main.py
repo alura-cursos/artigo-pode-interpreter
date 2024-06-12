@@ -1,7 +1,7 @@
 from interpreter_utils import criar_arquivo, criar_assistente_dados_medicos, criar_thread, apagar_arquivo, apagar_thread, apagar_assistente
 
 def main():
-    file_path = "transplates_brasil.csv"
+    file_path = "transplantes_brasil.csv"
     arquivo = criar_arquivo(file_path)
     assistente = criar_assistente_dados_medicos(file_id=arquivo["id"])
     thread = criar_thread()
