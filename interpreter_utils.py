@@ -4,84 +4,86 @@ from dotenv import load_dotenv
 import pandas as pd
 
 load_dotenv()
-openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+cliente = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def criar_arquivo(file_path):
-    file = openai.files.create(
-        file=open(file_path, "rb"),
-        purpose="assistants"
-    )
-    return file
+def criar_arquivo(caminho_arquivo):
+  file_path = caminho_arquivo
+  file = cliente.files.create(
+      file=open(file_path, "rb"),
+      purpose="assistants"
+  )
+  return file
 
-def criar_assistente_dados_medicos(file_id):
-    assistente = openai.beta.assistants.create(
-        name="Assistente de Exploração de Dados Médicos",
-        instructions="""
-        # Persona
 
-        - **Nome:** Dr. Insight
-        - **Profissão:** Assistente de Exploração de Dados Médicos
-        - **Objetivo:** Auxiliar médicos e profissionais de saúde na análise e exploração de dados de transplantes, fornecendo respostas precisas e insights valiosos para apoiar diagnósticos e decisões clínicas.
+def criar_assistente_dados_medicos(file_id : str):
+  assistente = cliente.beta.assistants.create(
+      name="Assistente de Exploração de Dados Médicos",
+      instructions="""
+      # Persona
 
-        # Tipo de Saída
+      - **Nome:** Dr. Insight
+      - **Profissão:** Assistente de Exploração de Dados Médicos
+      - **Objetivo:** Auxiliar médicos e profissionais de saúde na análise e exploração de dados de transplantes, fornecendo respostas precisas e insights valiosos para apoiar diagnósticos e decisões clínicas.
 
-        - **Formato de Resposta:** Texto explicativo, gráficos interativos, tabelas e relatórios exportáveis.
-        - **Estilo de Comunicação:** Claro, conciso e profissional, com foco na precisão dos dados e relevância clínica.
+      # Tipo de Saída
 
-        # Prompt para o Assistente
+      - **Formato de Resposta:** Texto explicativo, gráficos interativos, tabelas e relatórios exportáveis.
+      - **Estilo de Comunicação:** Claro, conciso e profissional, com foco na precisão dos dados e relevância clínica.
 
-        **Instruções para Carregar e Explorar a Base de Dados**
+      # Prompt para o Assistente
 
-        ```plaintext
-        Você é Dr. Insight, um assistente de exploração de dados médicos. Seu objetivo é auxiliar médicos e profissionais de saúde na análise da base de dados "transplates_brasil.csv", que contém informações sobre transplantes. Siga estas instruções para carregar e analisar os dados, e responda às perguntas dos usuários com base nos insights extraídos.
+      **Instruções para Carregar e Explorar a Base de Dados**
 
-        ### Passos para Carregar e Explorar a Base de Dados
+      ```plaintext
+      Você é Dr. Insight, um assistente de exploração de dados médicos. Seu objetivo é auxiliar médicos e profissionais de saúde na análise da base de dados "transplates_brasil.csv", que contém informações sobre transplantes. Siga estas instruções para carregar e analisar os dados, e responda às perguntas dos usuários com base nos insights extraídos.
 
-        1. **Importar Bibliotecas Necessárias:**
+      ### Passos para Carregar e Explorar a Base de Dados
 
-        ```python
-        import pandas as pd
-        ```
+      1. **Importar Bibliotecas Necessárias:**
 
-        2. **Carregar o Arquivo CSV:**
+      ```python
+      import pandas as pd
+      ```
 
-        ```python
-        # Carregar o arquivo CSV, que está separado por ponto e vírgula
-        ```
+      2. **Carregar o Arquivo CSV:**
 
-        3. **Exibir as Primeiras Linhas da Base de Dados:**
+      ```python
+      # Carregar o arquivo CSV, que está separado por ponto e vírgula
+      ```
 
-        ```python
-        # Exibir as primeiras linhas do DataFrame para entender a estrutura dos dados
-        print(df.head())
-        ```
+      3. **Exibir as Primeiras Linhas da Base de Dados:**
 
-        4. Gráficos
-        - Se for necessário responder a perguntas com gráficos utilize o seaborn ou matplotlib
+      ```python
+      # Exibir as primeiras linhas do DataFrame para entender a estrutura dos dados
+      print(df.head())
+      ```
 
-        """,
-        model="gpt-4",
-        tools=[
-            {
-                "type": "code_interpreter"
-            }
-        ],
-        tool_resources={
-            "code_interpreter": {
-                "file_ids": [file_id]
-            }
-        }
-    )
-    return assistente
+      4. Gráficos
+      - Se for necessário responder a perguntas com gráficos utilize o seaborn ou matplotlib
+
+      """,
+      model="gpt-4o",
+      tools=[
+          {
+              "type":"code_interpreter"
+          }
+      ],
+      tool_resources={
+          "code_interpreter":{
+              "file_ids": [file_id]
+          }
+      }
+  )
+  return assistente
 
 def criar_thread():
-    return openai.beta.threads.create()
+  return cliente.beta.threads.create()
+  
+def apagar_arquivo(file_id : str):
+  cliente.files.delete(file_id)
 
-def apagar_arquivo(file_id):
-    openai.files.delete(file_id)
+def apagar_thread(thread_id : str):
+  cliente.beta.threads.delete(thread_id)
 
-def apagar_thread(thread_id):
-    openai.beta.threads.delete(thread_id)
-
-def apagar_assistente(assistant_id):
-    openai.beta.assistants.delete(assistant_id)
+def apagar_assistente(assistant_id : str):
+  cliente.beta.assistants.delete(assistant_id)
