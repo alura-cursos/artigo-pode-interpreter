@@ -1,20 +1,20 @@
-import openai
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
 import pandas as pd
 
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def criar_arquivo(file_path):
-    file = openai.File.create(
+    file = openai.files.create(
         file=open(file_path, "rb"),
         purpose="assistants"
     )
     return file
 
 def criar_assistente_dados_medicos(file_id):
-    assistente = openai.Assistant.create(
+    assistente = openai.beta.assistants.create(
         name="Assistente de Exploração de Dados Médicos",
         instructions="""
         # Persona
@@ -75,13 +75,13 @@ def criar_assistente_dados_medicos(file_id):
     return assistente
 
 def criar_thread():
-    return openai.Thread.create()
+    return openai.beta.threads.create()
 
 def apagar_arquivo(file_id):
-    openai.File.delete(file_id)
+    openai.files.delete(file_id)
 
 def apagar_thread(thread_id):
-    openai.Thread.delete(thread_id)
+    openai.beta.threads.delete(thread_id)
 
 def apagar_assistente(assistant_id):
-    openai.Assistant.delete(assistant_id)
+    openai.beta.assistants.delete(assistant_id)
